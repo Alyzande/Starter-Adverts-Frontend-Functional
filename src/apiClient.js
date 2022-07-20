@@ -2,8 +2,8 @@ import axios from "axios";
 const url = "http://localhost:3001/";
 
 export class ApiClient {
-  constructor(token, logoutHandler){
-    this.token = token;
+  constructor(tokenProvider, logoutHandler){
+    this.tokenProvider = tokenProvider;
     this.logoutHandler = logoutHandler;
   }
 
@@ -31,11 +31,17 @@ authenticatedCall(method, url, data) {
       method,
       url,
       headers: {
-        authorization: this.token
+        authorization: this.tokenProvider()
       },
-      data,
-    }).catch((error) => {
+      data
+    })
+    .catch((error) => {
+      if (error.response.status === 403) {
+      this.logoutHandler();
+      return Promise.reject()
+    } else {
       throw error;
+    }
     });
   }
 
