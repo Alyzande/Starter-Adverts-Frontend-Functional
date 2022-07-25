@@ -1,23 +1,23 @@
 import React, { useState } from "react";
 
-
 function Login(props) {
-  super(props);
+ 
   const [disabled, cDisabled] = useState(false);
 
   const submitHandler = (e) => {
-    console.log("submit");
+    //console.log("submit");
     e.preventDefault();
     cDisabled(true);
     props.client
-    .login(e.target.userName.value, e.target.password.value)
+    .login(e.target.username.value,e.target.password.value)
     .then( (response) => {
       cDisabled(false);
+      //console.log(response.data.token)
       props.loggedIn(response.data.token);
     })
-    .catch(() => {
-      alert("an error has occured")
-      cDisabled(false);
+    .catch( () => {
+      alert("an error has occurred, please try again later");
+       cDisabled(false);
     })
   };
 
@@ -25,10 +25,10 @@ function Login(props) {
     <>
       Login
       <br />
-      <form onSubmit={(e) => this.submitHandler(e)}>
+      <form onSubmit={(e) => submitHandler(e)}>
         username
         <br />
-        <input type="text" name="userName" disabled={disabled} />
+        <input type="text" name="username" disabled={disabled} />
         <br />
         password
         <br />
@@ -45,6 +45,3 @@ function Login(props) {
 }
 
 export default Login;
-//https://www.youtube.com/watch?v=QUC5Lfw3W_Y&list=PLCxZN2AWRdpsoP64CZPEJ1wTeDMzeNGzq&index=50
-//why does this bloody thing not work
-// aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

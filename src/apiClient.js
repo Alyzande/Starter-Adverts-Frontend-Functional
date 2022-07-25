@@ -2,10 +2,30 @@ import axios from "axios";
 const url = "http://localhost:3001/";
 
 export class ApiClient {
-  constructor(tokenProvider, logoutHandler){
-    this.tokenProvider = tokenProvider;
+
+  constructor(token,logoutHandler) {
+    this.token = token;
     this.logoutHandler = logoutHandler;
   }
+
+  authenticatedCall(method, url, data) {
+    return axios({
+      method,
+      url,
+      headers: {
+        authorization: this.token
+      },
+      data,
+    }).catch((error) => {
+      if(error.response.status == 403) {
+        //logout the user
+        this.logoutHandler();
+        return Promise.reject();
+      } else {
+      throw error;
+      }
+    });
+  }  
 
 
   apiCall(method, url, data) {
@@ -14,48 +34,13 @@ export class ApiClient {
       url,
       data,
     }).catch((error) => {
-      if(error.response.status === 403){
-        this.logoutHandler();
-        return Promise.reject()
-      } else {
       throw error;
-      }
     });
   }
 
-//https://www.youtube.com/watch?v=QUC5Lfw3W_Y&list=PLCxZN2AWRdpsoP64CZPEJ1wTeDMzeNGzq&index=48
-// 08:54
-
-authenticatedCall(method, url, data) {
-    return axios({
-      method,
-      url,
-      headers: {
-        authorization: this.tokenProvider()
-      },
-      data
-    })
-    .catch((error) => {
-      if (error.response.status === 403) {
-      this.logoutHandler();
-      return Promise.reject()
-    } else {
-      throw error;
-    }
-    });
+  login(userName, password){
+    return this.apiCall('post', `${url}auth`, {userName: userName, password: password} )
   }
-
-  async login(userName, password) {
-    return await axios ({
-      method: "post",
-      url: `${url}auth`,
-      data: {
-        userName,
-        password
-      }
-    });
-  }
-
   getAds() {
     return this.authenticatedCall("get", url);
   }
